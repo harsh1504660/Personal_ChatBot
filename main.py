@@ -25,11 +25,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 # ============ LOAD DOCUMENT ============ #
-# llm = HuggingFaceEndpoint(
-#     repo_id="meta-llama/Llama-3.1-8B-Instruct",
-#     task="text-generation",
-# )
-#model = ChatHuggingFace(llm=llm)
+llm = HuggingFaceEndpoint(
+    repo_id="meta-llama/Llama-3.1-8B-Instruct",
+    task="text-generation",
+)
+model = ChatHuggingFace(llm=llm)
 # Load and split your personal document
 loader = TextLoader("info.txt", encoding="utf-8")  # Ensure your personal info is in this file
 docs = loader.load()
@@ -42,10 +42,10 @@ chunks = text_splitter.split_documents(docs)
 
 print("======================================loaded document=================================================")
 # Vectorstore
-embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+#embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 # vectorstore = FAISS.from_documents(chunks, embedding_model)
 # vectorstore.save_local("faiss_index") 
-vectorstore = FAISS.load_local("faiss_index", embedding_model, allow_dangerous_deserialization=True)
+#vectorstore = FAISS.load_local("faiss_index", embedding_model, allow_dangerous_deserialization=True)
 
 
 print("======================================loaded vectorsotrs=================================================")
@@ -78,10 +78,10 @@ async def chat(req: ChatRequest):
     # })
 
     # Update history
-    #answer = response["answer"] if isinstance(response, dict) and "answer" in response else str(response)
+    # answer = response["answer"] if isinstance(response, dict) and "answer" in response else str(response)
 
     history.append(HumanMessage(content=req.user_input))
-    #history.append(AIMessage(content=answer))
+    # history.append(AIMessage(content=answer))
 
    
     sessions[session_id] = history
