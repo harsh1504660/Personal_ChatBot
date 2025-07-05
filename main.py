@@ -42,11 +42,16 @@ chunks = text_splitter.split_documents(docs)
 
 print("======================================loaded document=================================================")
 # Vectorstore
-embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/paraphrase-MiniLM-L3-v2")
+#embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/paraphrase-MiniLM-L3-v2")
+import os
 
+from langchain.embeddings import CohereEmbeddings
+
+embedding_model = CohereEmbeddings(cohere_api_key=os.environ.get("COHERE_API_KEY"),user_agent="langchain")
 vectorstore = FAISS.from_documents(chunks, embedding_model)
 # vectorstore.save_local("faiss_index") 
-# vectorstore = FAISS.load_local("faiss_index", model, allow_dangerous_deserialization=True)
+#vectorstore = FAISS.load_local("faiss_index", model, allow_dangerous_deserialization=True)
+#vectorstore = FAISS.load_local("faiss_index", embeddings=None, allow_dangerous_deserialization=True)
 
 
 print("======================================loaded vectorsotrs=================================================")
