@@ -1,0 +1,129 @@
+My personal background:
+My name is Harsh Joshi, and I was born on 15th September 2004 in Nashik, a vibrant city in Maharashtra, India.
+I am fluent in Marathi, Hindi, and English, and I also possess a basic understanding of Sanskrit.
+I value clear communication and cultural diversity, which helps me connect with people from different backgrounds.
+
+
+My strengths:
+I am a quick and adaptive learner, capable of grasping new concepts efficiently.
+One of my key strengths is multi-tasking—I can manage multiple responsibilities simultaneously without compromising on quality.
+I perform best under pressure and often deliver my highest potential when working with tight deadlines or challenging conditions.
+
+My Education :
+I completed my schooling up to the 10th grade at Anand Niketan School, an innovative and progressive institution located in Nashik.
+For my junior college education (11th and 12th), I attended H.P.T. & R.Y.K. Arts and Science College, Nashik.
+Currently, I am pursuing a Bachelor's degree in Electronics and Telecommunication Engineering at Dr. D.Y. Patil College of Engineering, Akurdi, Pune.
+I am expected to graduate in 2026.
+
+My projects :
+I have done multiple projects like smart-answer-evaluator, Hand gesture VLC media controller, and Early stage Diabetes detector, And currently building the project in EdTech field.
+
+project : 🧠 Smart answer evaluator : 
+Overview:
+A web-based AI tool that allows an invigilator to input both a student’s answer and the ideal answer. The system then evaluates the student’s response and allocates marks based on the maximum marks defined by the user.
+
+Technical Details:
+Utilized BERT architecture, specifically S-BERT, to encode the pair of answers (student + ideal answer).
+Generated synthetic training data using OpenAI APIs, including variations of student responses labeled as incorrect, partially correct, or correct.
+Designed a custom scoring formula that computes final marks based on the probability distribution across the three classes and the max marks provided.
+Implemented soft-checking and hard-checking modes by dynamically adjusting classification thresholds to allow flexible grading policies.
+
+Tech Stack:
+Model: Hugging Face Transformers, TensorFlow
+Backend: Flask, FastAPI
+Frontend: HTML, CSS   
+
+project : ✋ Hand gesture VLC media controller 
+Overview:
+Developed an AI-powered gesture recognition system to control VLC Media Player through predefined hand signs. This system allows users to control playback (play, pause, next, previous, volume up/down) using only hand gestures.
+
+Technical Details:
+Trained a deep learning model using the HaGrid dataset to classify various hand gestures.
+Integrated the gesture prediction with VLC's API, enabling real-time multimedia control.
+
+Tech Stack:
+Modeling: TensorFlow
+Integration: VLC Media Player API
+Dataset: HaGrid
+
+project : 🩺 Early stage Diabetes detector
+Overview:
+A machine learning application that predicts the likelihood of early-stage diabetes based on medical parameters such as age, blood pressure, hypertension, and more, achieving 97% accuracy.
+
+Technical Details:
+Collected and preprocessed structured health data.
+Built classification models using various algorithms and selected the best-performing one based on validation accuracy and ROC-AUC.
+Provided a user-friendly interface for health professionals or individuals to input parameters and get instant predictions.
+
+Tech Stack:
+Modeling: Scikit-learn
+UI/Deployment: Streamlit
+
+My Work Experience:
+Agri Spectra AI,Austria as a Data Science Intern
+During this 6-month internship, I contributed across multiple stages of AI-driven agricultural diagnostics, working with cutting-edge technologies in deep learning, hyperspectral imaging, and geospatial data processing.
+
+🔬 Phase 1: Plant Disease Detection using 2D CNNs
+Collected and merged multiple public datasets to create a robust dataset of 120,000+ plant images spanning 117 disease classes.
+
+Trained and fine-tuned deep learning models such as ResNet and EfficientNet using TensorFlow/Keras.
+
+Achieved a classification accuracy of ~89%, optimizing for real-world field conditions and imbalanced classes.
+
+Performed advanced data preprocessing and augmentation to enhance generalization.
+
+🌈 Phase 2: Hyperspectral Imaging & 3D Deep Learning
+Transitioned to hyperspectral imaging (HSI) for finer disease classification.
+
+Collected HSI data for grapevine diseases using Copernicus Sentinel satellite imagery.
+
+Developed and benchmarked models such as HSI Transformer and Hyper3DNet, achieving an accuracy of 83% on raw pixel-level classification tasks.
+
+Integrated MLflow for comprehensive experiment tracking, hyperparameter tuning, and reproducibility across model versions.
+
+🛠️ Phase 3: Building the MVP Web Platform
+Built the Minimum Viable Product (MVP) for Agri Spectra AI using modern web technologies:
+
+Frontend: TypeScript, React
+
+Backend: Node.js
+
+Database: Firebase Realtime DB
+
+Implemented geospatial features such as:
+
+NDVI (Normalized Difference Vegetation Index) calculation
+
+Soil moisture estimation
+
+Field-level analytics using Google Earth Engine API
+Integrated an interactive map-based interface allowing users to select fields and instantly retrieve vegetation and soil health metrics.
+▶️ Live MVP: https://www.agri-spectra.com
+
+My Skills & Tools
+AI/ML : TensorFlow, Transformer, Scikit-Learn
+MLOPS : MLFlow, WhyLabs, Docker
+Gen-AI : LangChain, LangGraph, VectorDB
+Web Dev : React, Node.js, Express.js, HTML/CSS
+Languages : Python, C++, JavaScript
+
+My Online Presences : 
+GitHub : https://github.com/harsh1504660
+Medium : https://medium.com/@harshsmj1504
+LinkedIn : https://www.linkedin.com/in/harsh-joshi-20a30b20b/
+Email : harshsmj1504@gmail.com
+
+My Published Articles : 
+1. From Missing to Meaning: Strategies for Effectively Handling Missing Data : 
+2. IPL Win Predictor: Easy Streamlit Development and Deployment Guide
+3. IPL Win Predictor: Analyzing Winning Probabilities
+4. Understanding Feature Scaling in Machine Learning: Techniques, Implementation, and Advantages
+5. Mastering Machine Learning: Types, Tools, and Triumphs
+
+🎯 My Future Goals
+I aim to build scalable and impactful AI solutions in fields like healthcare, agriculture, and education. I plan to pursue higher studies in AI, contribute to cutting-edge research, and eventually lead or be part of a startup focused on real-world innovation. I’m also passionate about mentoring and contributing to open-source communities.
+
+My Hobbies :
+I enjoy playing cricket, and Sachin Tendulkar is my favorite player. I also have a keen interest in reading research papers and technical articles. In my leisure time, I love watching Bollywood movies and listening to music—Arijit Singh is my favorite singer.
+
+
