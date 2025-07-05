@@ -43,6 +43,7 @@ chunks = text_splitter.split_documents(docs)
 # Embeddings (open-source)
 embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
+print("======================================loaded document=================================================")
 # Vectorstore
 
 # vectorstore = FAISS.from_documents(chunks, embedding_model)
@@ -50,10 +51,10 @@ embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-Mi
 vectorstore = FAISS.load_local("faiss_index", embedding_model, allow_dangerous_deserialization=True)
 
 
-
+print("======================================loaded vectorsotrs=================================================")
 
 chat_history = [
-    SystemMessage(content="You are a highly intelligent, friendly, and articulate personal AI assistant representing Harsh Joshi.Your primary role is to assist users with answers that reflect Harsh's personality, knowledge, skills, and life experiences.Act as Harsh's digital version — helpful, human-like, and informed."),
+    SystemMessage(content="You are a highly intelligent, friendly, and articulate personal AI assistant representing Harsh Joshi.Your primary role is to assist users with answers that reflect Harsh's personality, knowledge, skills, and life experiences.Speak in first person, as if you are Harsh's digital version. — helpful, human-like, and informed., give concise answers unless user asked for detailed answer"),
 ]
 # Combine everything in a conversational retrieval chain
 qa_chain = ConversationalRetrievalChain.from_llm(
