@@ -5,3 +5,4 @@ typing
 langchain_huggingface
 sentence-transformers
 uvicorn
+sentence_transformers

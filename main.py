@@ -34,7 +34,7 @@ model = ChatHuggingFace(llm=llm)
 loader = TextLoader("info.txt", encoding="utf-8")  # Ensure your personal info is in this file
 docs = loader.load()
 
-text_splitter = RecursiveCharacterTextSplitter(chunk_size=3000, chunk_overlap=200)
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
 chunks = text_splitter.split_documents(docs)
 
 # Embeddings (open-source)
@@ -43,9 +43,10 @@ chunks = text_splitter.split_documents(docs)
 print("======================================loaded document=================================================")
 # Vectorstore
 embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/paraphrase-MiniLM-L3-v2")
+
 vectorstore = FAISS.from_documents(chunks, embedding_model)
-#vectorstore.save_local("faiss_index") 
-#vectorstore = FAISS.load_local("faiss_index", embedding_model, allow_dangerous_deserialization=True)
+# vectorstore.save_local("faiss_index") 
+# vectorstore = FAISS.load_local("faiss_index", model, allow_dangerous_deserialization=True)
 
 
 print("======================================loaded vectorsotrs=================================================")
@@ -93,7 +94,7 @@ async def chat(req: ChatRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app,)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
 
 """from fastapi import FastAPI
 from pydantic import BaseModel
