@@ -15,12 +15,12 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 sessions: Dict[str, List] = {}
 
-
+app.add_middleware(...)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*","http://localhost:8080"],  # or specify your frontend origin
-    allow_credentials=False,
+    allow_origins=["http://localhost:8080"],  # or specify your frontend origin
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -28,6 +28,7 @@ app.add_middleware(
 llm = HuggingFaceEndpoint(
     repo_id="meta-llama/Llama-3.1-8B-Instruct",
     task="text-generation",
+    huggingfacehub_api_token=os.environ.get("HUGGINGFACE_TOKEN",),  # Ensure you set this environment variable
 )
 model = ChatHuggingFace(llm=llm)
 # Load and split your personal document
