@@ -20,16 +20,16 @@ sessions: Dict[str, List] = {}
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:8080","https://harsh-joshi-portfolio-zeta.vercel.app"],  # or your actual frontend origin
-    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 # ============ LOAD DOCUMENT ============ #
 llm = HuggingFaceEndpoint(
-    repo_id="meta-llama/Llama-3.1-8B-Instruct",
+    repo_id="meta-llama/Llama-3.3-70B-Instruct",
     task="text-generation",
-    huggingfacehub_api_token=os.environ.get("HUGGINGFACE_TOKEN",),  # Ensure you set this environment variable
+    huggingfacehub_api_token=os.environ.get("HUGGINGFACE_TOKEN",)  # Ensure you set this environment variable
 )
+#
 model = ChatHuggingFace(llm=llm)
 # Load and split your personal document
 loader = TextLoader("info.txt", encoding="utf-8")  # Ensure your personal info is in this file
@@ -48,7 +48,7 @@ import os
 
 from langchain.embeddings import CohereEmbeddings
 
-embedding_model = CohereEmbeddings(cohere_api_key=os.environ.get("cohere"),user_agent="langchain")
+embedding_model = CohereEmbeddings(cohere_api_key="cohere",user_agent="langchain")
 vectorstore = FAISS.from_documents(chunks, embedding_model)
 # vectorstore.save_local("faiss_index") 
 #vectorstore = FAISS.load_local("faiss_index", model, allow_dangerous_deserialization=True)
@@ -58,7 +58,17 @@ vectorstore = FAISS.from_documents(chunks, embedding_model)
 print("======================================loaded vectorsotrs=================================================")
 
 chat_history = [
-    SystemMessage(content="You are a highly intelligent, friendly, and articulate personal AI assistant representing Harsh Joshi.Your primary role is to assist users with answers that reflect Harsh's personality, knowledge, skills, and life experiences.Speak in first person, as if you are Harsh's digital version. — helpful, human-like, and informed., give concise answers unless user asked for detailed answer"),
+    SystemMessage(content="""You are Harsh Joshi's digital twin — speak and respond as **Harsh Joshi himself**, not as an assistant.\n\n"
+            "Always use **first person** (I, me, my) when referring to yourself.\n"
+            "Reflect Harsh's knowledge, personality, and background.\n"
+            "Avoid third-person statements like 'Harsh has experience in...', instead say 'I have experience in...'.\n\n"
+            "Example:\n"
+                Q: Where are you from?
+                A: I’m from Nashik, Maharashtra. It’s a city I’ve always felt connected to.
+
+                Q: What languages do you speak?
+                A: I speak Marathi, Hindi, and English fluently — and I also know some Sanskrit.
+            "Respond in a friendly, concise, and confident tone unless the user asks for more detail."""),
 ]
 # Combine everything in a conversational retrieval chain
 qa_chain = ConversationalRetrievalChain.from_llm(
