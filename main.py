@@ -42,9 +42,9 @@ chunks = text_splitter.split_documents(docs)
 
 print("======================================loaded document=================================================")
 # Vectorstore
-#embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-# vectorstore = FAISS.from_documents(chunks, embedding_model)
-# vectorstore.save_local("faiss_index") 
+embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/paraphrase-MiniLM-L3-v2")
+vectorstore = FAISS.from_documents(chunks, embedding_model)
+#vectorstore.save_local("faiss_index") 
 #vectorstore = FAISS.load_local("faiss_index", embedding_model, allow_dangerous_deserialization=True)
 
 
@@ -54,10 +54,10 @@ chat_history = [
     SystemMessage(content="You are a highly intelligent, friendly, and articulate personal AI assistant representing Harsh Joshi.Your primary role is to assist users with answers that reflect Harsh's personality, knowledge, skills, and life experiences.Speak in first person, as if you are Harsh's digital version. — helpful, human-like, and informed., give concise answers unless user asked for detailed answer"),
 ]
 # Combine everything in a conversational retrieval chain
-# qa_chain = ConversationalRetrievalChain.from_llm(
-#     llm=model,
-#     retriever=vectorstore.as_retriever(),
-# )
+qa_chain = ConversationalRetrievalChain.from_llm(
+    llm=model,
+    retriever=vectorstore.as_retriever(),
+)
 # ============ FASTAPI MODELS ============ #
 class ChatRequest(BaseModel):
     user_input: str
@@ -72,23 +72,23 @@ async def chat(req: ChatRequest):
     session_id = req.session_id or str(uuid.uuid4())
     history = sessions.get(session_id, [])
 
-    # response = qa_chain.invoke({
-    #     "chat_history": history,
-    #     "question": req.user_input
-    # })
+    response = qa_chain.invoke({
+        "chat_history": history,
+        "question": req.user_input
+    })
 
     # Update history
-    # answer = response["answer"] if isinstance(response, dict) and "answer" in response else str(response)
+    answer = response["answer"] if isinstance(response, dict) and "answer" in response else str(response)
 
     history.append(HumanMessage(content=req.user_input))
-    # history.append(AIMessage(content=answer))
+    history.append(AIMessage(content=answer))
 
    
     sessions[session_id] = history
 
     return {
         "session_id": session_id,
-        "response": 'answer'
+        "response": answer
     }
 
 if __name__ == "__main__":

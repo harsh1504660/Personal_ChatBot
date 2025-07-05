@@ -4,3 +4,4 @@ langchain_community
 typing
 langchain_huggingface
 sentence-transformers
+uvicorn
