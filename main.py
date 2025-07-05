@@ -41,11 +41,11 @@ text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=20
 chunks = text_splitter.split_documents(docs)
 
 # Embeddings (open-source)
-embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+
 
 print("======================================loaded document=================================================")
 # Vectorstore
-
+embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 # vectorstore = FAISS.from_documents(chunks, embedding_model)
 # vectorstore.save_local("faiss_index") 
 vectorstore = FAISS.load_local("faiss_index", embedding_model, allow_dangerous_deserialization=True)
