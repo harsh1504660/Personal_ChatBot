@@ -15,7 +15,7 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 sessions: Dict[str, List] = {}
 
-app.add_middleware(...)
+
 
 app.add_middleware(
     CORSMiddleware,
