@@ -1,15 +1,12 @@
-from fastapi import FastAPI, Request
+"""from fastapi import FastAPI
 from pydantic import BaseModel
 from langchain.vectorstores import FAISS
 from langchain.embeddings import HuggingFaceEmbeddings
-from langchain_community.llms import HuggingFaceHub
 from langchain.chains import ConversationalRetrievalChain
-from langchain.prompts import PromptTemplate
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from typing import List, Dict
 import uuid
 from langchain.schema import SystemMessage, HumanMessage, AIMessage
-from langchain.text_splitter import CharacterTextSplitter
 from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
 from langchain_community.document_loaders import TextLoader
 import os
@@ -22,7 +19,7 @@ sessions: Dict[str, List] = {}
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # or specify your frontend origin
+    allow_origins=["*","http://localhost:8080"],  # or specify your frontend origin
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -96,4 +93,91 @@ async def chat(req: ChatRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app,)
+    uvicorn.run(app,)"""
+
+from fastapi import FastAPI
+from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
+from langchain.vectorstores import FAISS
+from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_community.llms import HuggingFaceHub
+from langchain.chains import ConversationalRetrievalChain
+from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
+from langchain.schema import HumanMessage, AIMessage, SystemMessage
+from typing import List, Dict
+import uuid
+
+# ============ FASTAPI APP ============ #
+app = FastAPI()
+sessions: Dict[str, List] = {}
+
+# ============ CORS ============ #
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:8080"],  # avoid "*" when allow_credentials=True
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ============ MODEL & CHAIN SETUP ============ #
+
+# Load lightweight embedding model
+embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+
+# Load FAISS index (precomputed and saved beforehand)
+vectorstore = FAISS.load_local("faiss_index", embedding_model, allow_dangerous_deserialization=True)
+
+# Hugging Face LLM (lightweight instruct model recommended if on free tier)
+llm_endpoint = HuggingFaceEndpoint(
+    repo_id="meta-llama/Llama-3.1-8B-Instruct",  # Consider switching to a smaller instruct model
+    task="text-generation",
+)
+llm = ChatHuggingFace(llm=llm_endpoint)
+
+# Conversational retrieval chain
+qa_chain = ConversationalRetrievalChain.from_llm(
+    llm=llm,
+    retriever=vectorstore.as_retriever(),
+)
+
+# System prompt
+system_message = SystemMessage(
+    content="You are a highly intelligent, friendly, and articulate personal AI assistant representing Harsh Joshi. "
+            "Your primary role is to assist users with answers that reflect Harsh's personality, knowledge, skills, and life experiences. "
+            "Speak in first person, as if you are Harsh's digital version — helpful, human-like, and informed. "
+            "Give concise answers unless the user asks for detailed explanation."
+)
+
+# ============ REQUEST/RESPONSE MODELS ============ #
+class ChatRequest(BaseModel):
+    user_input: str
+    session_id: str = None
+
+class ChatResponse(BaseModel):
+    session_id: str
+    response: str
+
+# ============ CHAT ENDPOINT ============ #
+@app.post("/chat", response_model=ChatResponse)
+async def chat(req: ChatRequest):
+    session_id = req.session_id or str(uuid.uuid4())
+    history = sessions.get(session_id, [system_message])  # Start with system message only once
+
+    response = qa_chain.invoke({
+        "chat_history": history,
+        "question": req.user_input
+    })
+
+    answer = response.get("answer", str(response))
+
+    history.append(HumanMessage(content=req.user_input))
+    history.append(AIMessage(content=answer))
+    sessions[session_id] = history
+
+    return {"session_id": session_id, "response": answer}
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
