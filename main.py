@@ -74,9 +74,9 @@ class ChatResponse(BaseModel):
     response: str
 
 # ============ ENDPOINT ============ #
-@app.options("/chat")
+"""@app.options("/chat")
 async def options_chat():
-    return JSONResponse(status_code=200)
+    return JSONResponse(status_code=200)"""
 @app.post("/chat")
 async def chat(req: ChatRequest):
     session_id = req.session_id or str(uuid.uuid4())
