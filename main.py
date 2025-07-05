@@ -34,7 +34,7 @@ model = ChatHuggingFace(llm=llm)
 loader = TextLoader("info.txt", encoding="utf-8")  # Ensure your personal info is in this file
 docs = loader.load()
 
-text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=3000, chunk_overlap=200)
 chunks = text_splitter.split_documents(docs)
 
 # Embeddings (open-source)
