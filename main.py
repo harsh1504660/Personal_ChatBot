@@ -6,6 +6,7 @@ from langchain.chains import ConversationalRetrievalChain
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from typing import List, Dict
 import uuid
+from fastapi.responses import JSONResponse
 from langchain.schema import SystemMessage, HumanMessage, AIMessage
 from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
 from langchain_community.document_loaders import TextLoader
@@ -16,10 +17,9 @@ app = FastAPI()
 sessions: Dict[str, List] = {}
 
 
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8080"],  # or specify your frontend origin
+    allow_origins=["http://localhost:8080","https://harsh-joshi-portfolio-zeta.vercel.app"],  # or your actual frontend origin
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -74,6 +74,9 @@ class ChatResponse(BaseModel):
     response: str
 
 # ============ ENDPOINT ============ #
+@app.options("/chat")
+async def options_chat():
+    return JSONResponse(status_code=200)
 @app.post("/chat")
 async def chat(req: ChatRequest):
     session_id = req.session_id or str(uuid.uuid4())
