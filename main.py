@@ -44,7 +44,7 @@ text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=20
 chunks = text_splitter.split_documents(docs)
 
 embedding_model = CohereEmbeddings(
-    cohere_api_key='4yKUbbNxAHfezeuyc9eCJBtKmsZVJ2Oahcv945xW',
+    cohere_api_key=os.environ.get("cohere"),
     user_agent="langchain"
 )
 
