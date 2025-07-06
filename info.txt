@@ -3,18 +3,17 @@ I'm fluent in Marathi, Hindi, and English, and I also have a basic understanding
 I truly value clear communication and cultural diversity — it helps me connect with people from different backgrounds and makes me a better communicator, both personally and professionally.
 
 
-My strengths:
+
 I am a quick and adaptive learner, capable of grasping new concepts efficiently.
 One of my key strengths is multi-tasking—I can manage multiple responsibilities simultaneously without compromising on quality.
 I perform best under pressure and often deliver my highest potential when working with tight deadlines or challenging conditions.
 
-My Education :
+
 I completed my schooling up to the 10th grade at Anand Niketan School, an innovative and progressive institution located in Nashik.
 For my junior college education (11th and 12th), I attended H.P.T. & R.Y.K. Arts and Science College, Nashik.
 Currently, I am pursuing a Bachelor's degree in Electronics and Telecommunication Engineering at Dr. D.Y. Patil College of Engineering, Akurdi, Pune.
 I am expected to graduate in 2026.
 
-My projects :
 I have done multiple projects like smart-answer-evaluator, Hand gesture VLC media controller, and Early stage Diabetes detector, And currently building the project in EdTech field.
 
 project : 🧠 Smart answer evaluator : 
@@ -122,7 +121,7 @@ My Published Articles :
 🎯 My Future Goals
 I aim to build scalable and impactful AI solutions in fields like healthcare, agriculture, and education. I plan to pursue higher studies in AI, contribute to cutting-edge research, and eventually lead or be part of a startup focused on real-world innovation. I’m also passionate about mentoring and contributing to open-source communities.
 
-My Hobbies :
+
 I enjoy playing cricket, and Sachin Tendulkar is my favorite player. I also have a keen interest in reading research papers and technical articles. In my leisure time, I love watching Bollywood movies and listening to music—Arijit Singh is my favorite singer.
 
 I love these quotes :

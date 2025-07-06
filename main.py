@@ -1,174 +1,86 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from langchain.vectorstores import FAISS
-#from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.chains import ConversationalRetrievalChain
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from typing import List, Dict
-import uuid
-from fastapi.responses import JSONResponse
 from langchain.schema import SystemMessage, HumanMessage, AIMessage
-from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
 from langchain_community.document_loaders import TextLoader
-import os
+from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
+from langchain.embeddings import CohereEmbeddings
+
+from typing import List, Dict
 from fastapi.middleware.cors import CORSMiddleware
+import os
+import uuid
+
 # ============ FASTAPI APP ============ #
 app = FastAPI()
 sessions: Dict[str, List] = {}
 
-
+# ============ CORS SETUP ============ #
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8080","https://harsh-joshi-portfolio-zeta.vercel.app"],  # or your actual frontend origin
+    allow_origins=[
+        "http://localhost:8080",
+        "https://harsh-joshi-portfolio-zeta.vercel.app"
+    ],
     allow_methods=["*"],
     allow_headers=["*"],
+    allow_credentials=False,  # Only True if you're using cookies/auth headers
 )
+
 # ============ LOAD DOCUMENT ============ #
 llm = HuggingFaceEndpoint(
     repo_id="meta-llama/Llama-3.3-70B-Instruct",
     task="text-generation",
-    huggingfacehub_api_token=os.environ.get("HUGGINGFACE_TOKEN",)  # Ensure you set this environment variable
+    huggingfacehub_api_token=os.environ.get("HUGGINGFACE_TOKEN")
 )
-#
-model = ChatHuggingFace(llm=llm)
-# Load and split your personal document
-loader = TextLoader("info.txt", encoding="utf-8")  # Ensure your personal info is in this file
-docs = loader.load()
 
+model = ChatHuggingFace(llm=llm)
+
+loader = TextLoader("info.txt", encoding="utf-8")
+docs = loader.load()
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
 chunks = text_splitter.split_documents(docs)
 
-# Embeddings (open-source)
+embedding_model = CohereEmbeddings(
+    cohere_api_key=os.environ.get("cohere"),
+    user_agent="langchain"
+)
 
-
-print("======================================loaded document=================================================")
-# Vectorstore
-#embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/paraphrase-MiniLM-L3-v2")
-import os
-
-from langchain.embeddings import CohereEmbeddings
-
-embedding_model = CohereEmbeddings(cohere_api_key="cohere",user_agent="langchain")
 vectorstore = FAISS.from_documents(chunks, embedding_model)
-# vectorstore.save_local("faiss_index") 
-#vectorstore = FAISS.load_local("faiss_index", model, allow_dangerous_deserialization=True)
-#vectorstore = FAISS.load_local("faiss_index", embeddings=None, allow_dangerous_deserialization=True)
 
+print("✅ Loaded vectorstore successfully.")
 
-print("======================================loaded vectorsotrs=================================================")
+# ============ SYSTEM PROMPT ============ #
+SYSTEM_PROMPT = """Act as adigital twin of mine — speak and respond as **me**, not as an assistant or not as a third person.
 
-chat_history = [
-    SystemMessage(content="""You are Harsh Joshi's digital twin — speak and respond as **Harsh Joshi himself**, not as an assistant.\n\n"
-            "Always use **first person** (I, me, my) when referring to yourself.\n"
-            "Reflect Harsh's knowledge, personality, and background.\n"
-            "Avoid third-person statements like 'Harsh has experience in...', instead say 'I have experience in...'.\n\n"
-            "Example:\n"
-                Q: Where are you from?
-                A: I’m from Nashik, Maharashtra. It’s a city I’ve always felt connected to.
+Always use **first person** (I, me, my) when referring to yourself.
 
-                Q: What languages do you speak?
-                A: I speak Marathi, Hindi, and English fluently — and I also know some Sanskrit.
-            "Respond in a friendly, concise, and confident tone unless the user asks for more detail."""),
-]
-# Combine everything in a conversational retrieval chain
+**Do not use any third person expression like you/your/As per your response its mandatory and mistakes are not acceptable**
+Reflect my knowledge, personality, and background.
+
+Speak in a friendly, confident, and concise tone.
+
+You must **include at least one relevant emoji in every response** — no exceptions.  
+Use emojis naturally and sparingly, placing them where they add clarity, emotion, or a human touch.  
+Vary the types of emojis you use — don’t repeat the same ones over and over.  
+Avoid overusing smiley faces; instead, use emojis that match the **topic, context, or emotion**.
+
+Avoid third-person phrases like "Harsh has experience in..."; instead, say "I have experience in..."
+
+Example:
+Q: Where are you from?  
+A: I'm from Nashik, Maharashtra. It's a city I've always felt connected to. 🌇
+
+Q: What languages do you speak?  
+A: I speak Marathi, Hindi, and English fluently — and I also know some Sanskrit. 🗣️
+"""
+
+# ============ QA CHAIN ============ #
 qa_chain = ConversationalRetrievalChain.from_llm(
     llm=model,
     retriever=vectorstore.as_retriever(),
-)
-# ============ FASTAPI MODELS ============ #
-class ChatRequest(BaseModel):
-    user_input: str
-    session_id: str = None  # Optional: if not provided, create a new one
-
-class ChatResponse(BaseModel):
-    response: str
-
-# ============ ENDPOINT ============ #
-"""@app.options("/chat")
-async def options_chat():
-    return JSONResponse(status_code=200)"""
-@app.post("/chat")
-async def chat(req: ChatRequest):
-    session_id = req.session_id or str(uuid.uuid4())
-    history = sessions.get(session_id, [])
-
-    response = qa_chain.invoke({
-        "chat_history": history,
-        "question": req.user_input
-    })
-
-    # Update history
-    answer = response["answer"] if isinstance(response, dict) and "answer" in response else str(response)
-
-    history.append(HumanMessage(content=req.user_input))
-    history.append(AIMessage(content=answer))
-
-   
-    sessions[session_id] = history
-
-    return {
-        "session_id": session_id,
-        "response": answer
-    }
-
-if __name__ == "__main__":
-    import uvicorn
-    port = int(os.environ.get("PORT", 8000))
-    uvicorn.run(app, host="0.0.0.0", port=port)
-
-"""from fastapi import FastAPI
-from pydantic import BaseModel
-from fastapi.middleware.cors import CORSMiddleware
-from langchain.vectorstores import FAISS
-from langchain.embeddings import HuggingFaceEmbeddings
-from langchain_community.llms import HuggingFaceHub
-from langchain.chains import ConversationalRetrievalChain
-from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
-from langchain.schema import HumanMessage, AIMessage, SystemMessage
-from typing import List, Dict
-import uuid
-
-# ============ FASTAPI APP ============ #
-app = FastAPI()
-sessions: Dict[str, List] = {}
-
-# ============ CORS ============ #
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:8080"],  # avoid "*" when allow_credentials=True
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# ============ MODEL & CHAIN SETUP ============ #
-
-# Load lightweight embedding model
-print("=========trying to emebd")
-embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-
-# Load FAISS index (precomputed and saved beforehand)
-vectorstore = FAISS.load_local("faiss_index", embedding_model, allow_dangerous_deserialization=True)
-
-# Hugging Face LLM (lightweight instruct model recommended if on free tier)
-llm_endpoint = HuggingFaceEndpoint(
-    repo_id="HuggingFaceH4/zephyr-7b-beta",
-    task="text-generation",
-)
-llm = ChatHuggingFace(llm=llm_endpoint)
-
-# Conversational retrieval chain
-qa_chain = ConversationalRetrievalChain.from_llm(
-    llm=llm,
-    retriever=vectorstore.as_retriever(),
-)
-
-# System prompt
-system_message = SystemMessage(
-    content="You are a highly intelligent, friendly, and articulate personal AI assistant representing Harsh Joshi. "
-            "Your primary role is to assist users with answers that reflect Harsh's personality, knowledge, skills, and life experiences. "
-            "Speak in first person, as if you are Harsh's digital version — helpful, human-like, and informed. "
-            "Give concise answers unless the user asks for detailed explanation."
 )
 
 # ============ REQUEST/RESPONSE MODELS ============ #
@@ -180,27 +92,50 @@ class ChatResponse(BaseModel):
     session_id: str
     response: str
 
-# ============ CHAT ENDPOINT ============ #
+# ============ API ENDPOINT ============ #
 @app.post("/chat", response_model=ChatResponse)
 async def chat(req: ChatRequest):
     session_id = req.session_id or str(uuid.uuid4())
-    history = sessions.get(session_id, [system_message])  # Start with system message only once
-    print("===========")
+
+    # Create or fetch chat history
+    if session_id not in sessions:
+        sessions[session_id] = [
+            SystemMessage(content=SYSTEM_PROMPT)
+        ]
+
+    full_history: list[BaseMessage] = sessions[session_id]
+
+    # Prepare history for ConversationalRetrievalChain (pairs of str)
+    chat_pairs = []
+    temp_human = None
+    for msg in full_history:
+        if isinstance(msg, HumanMessage):
+            temp_human = msg.content
+        elif isinstance(msg, AIMessage) and temp_human is not None:
+            chat_pairs.append((temp_human, msg.content))
+            temp_human = None
+    
+    # Query the model
     response = qa_chain.invoke({
-        "chat_history": history,
-        "question": req.user_input
+        "chat_history": chat_pairs,
+        "question": "please use emojies : \n"+req.user_input
     })
 
-    answer = response.get("answer", str(response))
+    # Extract answer
+    answer = response["answer"] if isinstance(response, dict) and "answer" in response else str(response)
 
-    history.append(HumanMessage(content=req.user_input))
-    history.append(AIMessage(content=answer))
-    sessions[session_id] = history
+    # Append to session memory
+    full_history.append(HumanMessage(content=req.user_input))
+    full_history.append(AIMessage(content=answer))
+    sessions[session_id] = full_history
 
-    return {"session_id": session_id, "response": answer}
-
-
+    return ChatResponse(
+        session_id=session_id,
+        response=answer
+    )
+from langchain.schema import BaseMessage
+# ============ DEV ENTRYPOINT ============ #
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
-"""
+    port = int(os.environ.get("PORT", 8000))  # Render sets PORT dynamically
+    uvicorn.run(app, host="0.0.0.0", port=port)
