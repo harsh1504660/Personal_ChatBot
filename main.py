@@ -133,6 +133,10 @@ async def chat(req: ChatRequest):
         session_id=session_id,
         response=answer
     )
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
 from langchain.schema import BaseMessage
 # ============ DEV ENTRYPOINT ============ #
 if __name__ == "__main__":
